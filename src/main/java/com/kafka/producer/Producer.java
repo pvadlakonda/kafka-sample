@@ -1,6 +1,7 @@
 package com.kafka.producer;
 
 import com.google.gson.Gson;
+import com.kafka.config.KafkaConfig;
 import com.kafka.model.Order;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -12,14 +13,13 @@ import java.util.Random;
 import java.util.UUID;
 
 public class Producer {
-    private static final String TOPIC = "events";
     private static final Gson gson = new Gson();
     private static final Random random = new Random();
     private static final String[] CATEGORIES = {"Electronics", "Books", "Toys", "Clothing"};
 
     public static void main(String[] args) throws InterruptedException {
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaConfig.BOOTSTRAP_SERVERS);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
@@ -35,7 +35,7 @@ public class Producer {
                 );
                 
                 String json = gson.toJson(order);
-                producer.send(new ProducerRecord<>(TOPIC, order.getOrderId(), json));
+                producer.send(new ProducerRecord<>(KafkaConfig.TOPIC_NAME, order.getOrderId(), json));
                 System.out.printf("Sent Order: %s | %s | Qty: %d | $%.2f%n", 
                     order.getOrderId(), order.getProductCategory(), order.getOrderQuantity(), order.getPricePerEach());
                 
